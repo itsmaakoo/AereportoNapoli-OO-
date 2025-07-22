@@ -72,34 +72,36 @@ public class InserisciVolo extends JFrame {
         Date partenza = (Date) dataPartenzaSpinner.getValue();
         Date arrivo = (Date) dataArrivoSpinner.getValue();
 
+        if (!arrivo.after(partenza) && !arrivo.equals(partenza)) {
+            JOptionPane.showMessageDialog(this, "La data di arrivo deve essere uguale o successiva alla partenza.");
+            return;
+        }
+
+
         if (destinazione.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Inserisci una destinazione.");
             return;
         }
 
-        if (arrivo.before(partenza)) {
-            JOptionPane.showMessageDialog(this, "Errore: arrivo prima della partenza.");
-            return;
-        }
 
-        Volo nuovoVolo = new Volo(destinazione, partenza, arrivo, "programmato", null);
+        // Crea il volo senza ID (verrà generato dal DB)
+        Volo nuovoVolo = new Volo (0, destinazione, partenza, arrivo, "programmato", "1"); // puoi cambiare gate e stato
 
-        try (Connection conn = ConnessioneDB.getConnection()) {
-            if (conn != null) {
-                VoloDAO volodao = new VoloDAO(conn);
-                boolean ok = volodao.salvaVolo(nuovoVolo);
-                if (ok) {
-                    JOptionPane.showMessageDialog(this, "Volo salvato con successo!");
-                    dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Errore durante il salvataggio.");
-                }
+        try {
+            Connection conn = ConnessioneDB.getConnection();
+            VoloDAO voloDao = new VoloDAO(conn);
+            boolean successo = voloDao.salvaVolo(nuovoVolo);
+
+            if (successo) {
+                JOptionPane.showMessageDialog(this, "Volo inserito con ID: " + nuovoVolo.getId());
+                destinazioneField.setText("");
+                // resetta anche gli spinner se vuoi
             } else {
-                JOptionPane.showMessageDialog(this, "Connessione al database fallita.");
+                JOptionPane.showMessageDialog(this, "Errore durante l'inserimento del volo.");
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Errore: " + ex.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errore di connessione o salvataggio.");
         }
     }
 

@@ -1,9 +1,15 @@
 package gui;
 
+import dao.VoloDAO;
+import db.ConnessioneDB;
+import model.Volo;
+
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.util.List;
 
-import model.Volo;
+
 
 
 public class ModificaVolo extends JFrame {
@@ -24,9 +30,25 @@ public class ModificaVolo extends JFrame {
         c.insets = new Insets(2, 2, 2, 2);
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        voloJComboBox = new JComboBox<>(Volo.archivio.toArray(new Volo[0]));
-        statoBox= new JComboBox<>(new String[]{"In Orario","In ritardo","Cancellato"});
+        voloJComboBox = new JComboBox<>();
+        statoBox= new JComboBox<>(new String[]{"In Orario","In ritardo","Cancellato", "Programmato"});
         confermaButton = new JButton("Conferma");
+
+        try{
+            Connection conn = ConnessioneDB.getConnection();
+            if(conn != null) {
+                VoloDAO voloDao = new VoloDAO(conn);
+                List<Volo> voli = voloDao.getTuttiVoli();
+                for (Volo volo : voli) {
+                    voloJComboBox.addItem(volo);
+                }
+            }else {
+                JOptionPane.showMessageDialog(this, "Connessione non trovato");
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errore durante il caricamento dei voli");
+        }
 
         c.gridx = 0;
         c.gridy = 0;
@@ -56,12 +78,23 @@ public class ModificaVolo extends JFrame {
         confermaButton.addActionListener(e->{
             Volo voloSelezionato = (Volo)voloJComboBox.getSelectedItem();
             if (voloSelezionato != null) {
-                voloSelezionato.setStato((String) statoBox.getSelectedItem());
-                JOptionPane.showMessageDialog(this, "Stato Aggiornato"+voloSelezionato);
+                String nuovoStato= (String) statoBox.getSelectedItem();
+                voloSelezionato.setStato(nuovoStato);
+                try{
+                    Connection conn = ConnessioneDB.getConnection();
+                    if(conn != null) {
+                        VoloDAO voloDao = new VoloDAO(conn);
+                        voloDao.aggiornaStato(voloSelezionato.getId(), statoBox.getSelectedItem().toString());
+                        JOptionPane.showMessageDialog(this, "Stato aggiornato:" +nuovoStato);
+                    }
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Errore durante il caricamento dei voli");
+                }
             }
         });
     }
     public static void main(String[] args) {
-        new AmministratoreGUI();
+        new ModificaVolo();
     }
 }

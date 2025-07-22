@@ -16,7 +16,7 @@ public class BagaglioDAO {
         this.connessione = connessione;
     }
     public void add(Bagaglio b, int prenotazioneId) throws SQLException{
-        String sql = "INSERT INTO bagagli (codice, prenotazioneId, stato, descrizione) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO bagaglio (codice, prenotazione_id, stato, note) VALUES (?,?,?,?)";
         try(PreparedStatement stmt = connessione.prepareStatement(sql)){
             stmt.setInt(1, b.getCodice());
             stmt.setInt(2, b.getPrenotazioneId());
@@ -27,7 +27,7 @@ public class BagaglioDAO {
     }
     public List<Bagaglio> trovaBagagliPerPrenotazione(int prenotazioneId) throws SQLException{
         List<Bagaglio> bagagli = new ArrayList<>();
-        String sql = "SELECT * FROM bagagli WHERE prenotazioneId = ?";
+        String sql = "SELECT * FROM bagaglio WHERE prenotazione_id = ?";
         try(PreparedStatement stmt = connessione.prepareStatement(sql)){
             stmt.setInt(1, prenotazioneId);
             ResultSet rs = stmt.executeQuery();
@@ -44,7 +44,7 @@ public class BagaglioDAO {
         return bagagli;
     }
     public void aggiornaStatoBagaglio(String codiceTracciamento, StatoBagaglio nuovoStato) throws SQLException{
-        String sql = "UPDATE stato SET stato = ? WHERE codiceTracciamento = ?";
+        String sql = "UPDATE stato SET stato = ? WHERE codice_tracciamento = ?";
         try(PreparedStatement stmt = connessione.prepareStatement(sql)){
             stmt.setString(1, nuovoStato.name());
             stmt.setString(2, codiceTracciamento);
@@ -52,14 +52,14 @@ public class BagaglioDAO {
         }
     }
     public void eliminaBagaglio(int codiceTracciamento) throws SQLException{
-        String sql = "DELETE FROM bagagli WHERE codiceTracciamento = ?";
+        String sql = "DELETE FROM bagaglio WHERE codice_tracciamento = ?";
         try(PreparedStatement stmt = connessione.prepareStatement(sql)){
             stmt.setInt(1, codiceTracciamento);
             stmt.executeUpdate();
         }
     }
     public Bagaglio trovaCodice(int codiceTracciamento) throws SQLException{
-        String sql = "SELECT * FROM bagagli WHERE codiceTracciamento = ?";
+        String sql = "SELECT * FROM bagaglio WHERE codice_tracciamento = ?";
         try(PreparedStatement stmt = connessione.prepareStatement(sql)){
             stmt.setInt(1, codiceTracciamento);
             ResultSet rs = stmt.executeQuery();

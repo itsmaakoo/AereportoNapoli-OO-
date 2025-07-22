@@ -75,7 +75,7 @@ public class AggiornaBagaglio extends JFrame {
                 List<Bagaglio> tuttibagagli = new ArrayList<>();
 
                 for (Prenotazione p : prenotazioni) {
-                    List<Bagaglio> bagagliPerPrenotazione = bagagliodao.trovaBagagliPerPrenotazione(p.getPrenotazioneId());
+                    List<Bagaglio> bagagliPerPrenotazione = bagagliodao.trovaBagagliPerPrenotazione(p.getId());
                     if (bagagliPerPrenotazione != null) {
                         tuttibagagli.addAll(bagagliPerPrenotazione);
                     }

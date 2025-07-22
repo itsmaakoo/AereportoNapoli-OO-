@@ -21,12 +21,13 @@ public class Volo {
     private List<Passeggero> passggeri = new ArrayList();
     public static List<Volo> archivio = new ArrayList();
 
-    public Volo(String destinazione, Date dataPartenza, Date dataArrivo, String stato, String gate) {
+    public Volo(int id, String destinazione, Date dataPartenza, Date dataArrivo, String stato, String gate) {
         this.destinazione = destinazione;
         this.data_partenza = dataPartenza;
         this.data_arrivo = dataArrivo;
         this.stato = stato;
         this.gate = gate;
+        this.id = id;
     }
 
     public void aggiungiBagaglio(Bagaglio b) {
@@ -94,8 +95,8 @@ public class Volo {
     }
 
     public String toString() {
-        String var10000 = this.destinazione;
-        return var10000 + " " + (new SimpleDateFormat("dd/MM/yyyy")).format(this.data_partenza) + "Stato: " + this.stato;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        return "ID: " + id + " - " + destinazione + " (" + sdf.format(data_partenza) + ") - Stato: " + stato;
     }
 }
 

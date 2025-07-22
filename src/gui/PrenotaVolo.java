@@ -52,9 +52,8 @@ public class PrenotaVolo extends JFrame {
         }*/
         conn = ConnessioneDB.getConnection();
         if (conn != null) {
-            VoloDAO voloDAO = new VoloDAO(conn);
-            List<Volo> voli = voloDAO.getTuttiVoli();
-            for (Volo v : voli) {
+            VoloDAO voloDAO = new VoloDAO(conn);List<Volo> voliPrenotabili = voloDAO.getVoliPrenotabili();
+            for (Volo v : voliPrenotabili) {
                 model.addElement(v);
             }
             // Usa la connessione, es. passala al tuo DAO
@@ -109,7 +108,7 @@ public class PrenotaVolo extends JFrame {
         String documento = cf;
         String stato = "Prenotazione confermata";
 
-        Prenotazione pr = new Prenotazione(num_biglietto, passeggeroId, documento, selezionato.getId(), prenotazioneId, stato);
+        Prenotazione pr = new Prenotazione(prenotazioneId,num_biglietto, passeggeroId, documento, selezionato.getId(), stato);
         PrenotazioneDAO prenotazioneDao = new PrenotazioneDAO(conn);
         prenotazioneDao.salvaPrenotazione(pr);
         JOptionPane.showMessageDialog(this, "Prenotazione confermata");

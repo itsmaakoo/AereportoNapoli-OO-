@@ -90,10 +90,10 @@ public class AggiungiBagaglio extends JFrame {
 
                     if (!prenotazioni.isEmpty()) {
                         Prenotazione primaprenotazione = prenotazioni.get(0); //usa la prima Prenotazione come default
-                        int prenotazioneId = primaprenotazione.getPrenotazioneId();
-                        Bagaglio nuovoBagaglio = new Bagaglio(prenotazioneId, codiceBagaglio, "bagaglio aggiunto manualmente");
+                        int Id = primaprenotazione.getId();
+                        Bagaglio nuovoBagaglio = new Bagaglio(Id, codiceBagaglio, "bagaglio aggiunto manualmente");
                         BagaglioDAO bagagliodao = new BagaglioDAO(connBagaglio);
-                        bagagliodao.add(nuovoBagaglio, prenotazioneId);
+                        bagagliodao.add(nuovoBagaglio, Id);
                         JOptionPane.showMessageDialog(this, "Bagaglio aggiunto al Volo");
                         campoBagaglio.setText("");
 

@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package dao;
 
 import java.sql.Connection;
@@ -17,17 +12,18 @@ public class PasseggeroDAO {
     private Connection connessione;
 
     public PasseggeroDAO(Connection conn) {
-        this.connessione = this.connessione;
+
+        this.connessione = conn;
     }
 
     public int salvaPasseggero(Passeggero passeggero) throws SQLException {
-        String sql = "INSERT INTO passeggeri (nome, cognome, codiceFiscale) VALUES (?,?,?) RETURNING id";
+        String sql = "INSERT INTO passeggero (nome, cognome, codiceFiscale) VALUES (?,?,?) RETURNING id";
 
         try (PreparedStatement stmt = this.connessione.prepareStatement(sql)) {
             stmt.setString(1, passeggero.getNome());
             stmt.setString(2, passeggero.getCognome());
             stmt.setString(3, passeggero.getCodiceFiscale());
-            stmt.executeUpdate();
+
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return rs.getInt("id");
@@ -38,7 +34,7 @@ public class PasseggeroDAO {
     }
 
     public Passeggero trovaPerCodiceFiscale(String codiceFiscale) throws SQLException {
-        String sql = "SELECT * FROM passeggeri WHERE codiceFiscale = ?";
+        String sql = "SELECT * FROM passeggero WHERE codiceFiscale = ?";
 
         try (PreparedStatement stmt = this.connessione.prepareStatement(sql)) {
             stmt.setString(1, codiceFiscale);
@@ -53,7 +49,7 @@ public class PasseggeroDAO {
 
     public List<Passeggero> trovaListaPasseggero() throws SQLException {
         List<Passeggero> listaPasseggero = new ArrayList();
-        String sql = "SELECT * FROM passeggeri";
+        String sql = "SELECT * FROM passeggero";
 
         try (PreparedStatement stmt = this.connessione.prepareStatement(sql)) {
             ResultSet rs = stmt.executeQuery();
@@ -67,7 +63,7 @@ public class PasseggeroDAO {
     }
 
     public void aggiornaPasseggero(Passeggero passeggero) throws SQLException {
-        String sql = "UPDATE passeggeri SET nome=?, cognome=?, WHERE codiceFiscale=?";
+        String sql = "UPDATE passeggero SET nome=?, cognome=?, WHERE codiceFiscale=?";
 
         try (PreparedStatement stmt = this.connessione.prepareStatement(sql)) {
             stmt.setString(1, passeggero.getNome());
@@ -79,13 +75,13 @@ public class PasseggeroDAO {
     }
 
     public void eliminaPasseggero(String codiceFiscale) throws SQLException {
-        String sql = "DELETE FROM passeggeri WHERE codiceFiscale = ?";
+        String sql = "DELETE FROM passeggero WHERE codiceFiscale = ?";
 
         try (PreparedStatement stmt = this.connessione.prepareStatement(sql)) {
             stmt.setString(1, codiceFiscale);
             stmt.executeUpdate();
         }
-
     }
-}
+    }
+
 
