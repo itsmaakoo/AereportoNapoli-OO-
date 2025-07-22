@@ -1,11 +1,16 @@
 package gui;
 
+import dao.VoloDAO;
+import db.ConnessioneDB;
+
 import model.Bagaglio;
 import model.Volo;
 import model.StatoBagaglio;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.util.List;
 
 public class BagaglioSmarrito extends JFrame {
     private JComboBox<Volo> voloJComboBox;
@@ -31,11 +36,26 @@ public class BagaglioSmarrito extends JFrame {
         add(new JLabel());
         add(segnalaBagaglioButton);
 
-        voloJComboBox.addActionListener(e->{
-            Volo v = (Volo)voloJComboBox.getSelectedItem();
+        try {
+            Connection conn = ConnessioneDB.getConnection();
+            if (conn != null) {
+                VoloDAO voloDAO = new VoloDAO(conn);
+                List<Volo> voli = voloDAO.getTuttiVoli();
+                for (Volo v : voli) {
+                    voloJComboBox.addItem(v);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Connessione al database fallita");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Errore durante il caricamento dei voli");
+        }
+        voloJComboBox.addActionListener(e -> {
+            Volo v = (Volo) voloJComboBox.getSelectedItem();
             bagaglioJComboBox.removeAllItems();
-            if(v != null){
-                for(Bagaglio b : v.getBagagli()){
+            if (v != null) {
+                for (Bagaglio b : v.getBagagli()) {
                     bagaglioJComboBox.addItem(b);
                 }
             }
