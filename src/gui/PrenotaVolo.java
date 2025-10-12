@@ -1,25 +1,18 @@
 package gui;
 
-import dao.PasseggeroDAO;
-import db.ConnessioneDB;
-import model.Passeggero;
-import model.Prenotazione;
+import controller.PrenotaVoloController;
 import model.Volo;
-import dao.VoloDAO;
-import dao.PrenotazioneDAO;
-
 import javax.swing.*;
 import java.awt.*;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Random;
+
 
 public class PrenotaVolo extends JFrame {
 
     private JTextField nomeField, cognomeField, codiceFiscale;
     private JList<Volo> listaVoli;
-    private Connection conn;
+    private PrenotaVoloController controller;
 
     public PrenotaVolo() {
         setTitle("Prenota Volo");
@@ -27,8 +20,9 @@ public class PrenotaVolo extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JPanel panel = new JPanel(new BorderLayout());
+        controller = new PrenotaVoloController();
 
+        JPanel panel = new JPanel(new BorderLayout());
 
         JPanel formPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         nomeField = new JTextField();
@@ -45,25 +39,8 @@ public class PrenotaVolo extends JFrame {
         panel.add(formPanel, BorderLayout.NORTH);
 
         DefaultListModel<Volo> model = new DefaultListModel<>();
-        /*try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }*/
-        conn = ConnessioneDB.getConnection();
-        if (conn != null) {
-            VoloDAO voloDAO = new VoloDAO(conn);List<Volo> voliPrenotabili = voloDAO.getVoliPrenotabili();
-            for (Volo v : voliPrenotabili) {
-                model.addElement(v);
-            }
-            // Usa la connessione, es. passala al tuo DAO
-            /*JOptionPane.showMessageDialog(null, "Connessione al DB riuscita!");
-            dispose();
-            return;*/
-        }
-
-
-
+        List<Volo> voliPrenotabili = controller.getVoliPrenotabili();
+        voliPrenotabili.forEach(model::addElement);
 
         listaVoli = new JList<>(model);
         listaVoli.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -78,6 +55,7 @@ public class PrenotaVolo extends JFrame {
                 throw new RuntimeException(ex);
             }
         });
+
         panel.add(checkInButton, BorderLayout.SOUTH);
         add(panel);
         setVisible(true);
@@ -89,32 +67,14 @@ public class PrenotaVolo extends JFrame {
         String cognome = cognomeField.getText().trim();
         String cf = codiceFiscale.getText().trim();
 
-        if (selezionato == null || nome.isEmpty() || cognome.isEmpty() || cf.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "compila tutti i campi");
+        boolean success = controller.prenotaVolo(nome, cognome, cf, selezionato);
+        if (success) {
+            JOptionPane.showMessageDialog(this, "Prenotazione confermata");
+            nomeField.setText("");
+            cognomeField.setText("");
+            codiceFiscale.setText("");
+        } else {
+            JOptionPane.showMessageDialog(this, "Errore durante la prenotazione controlla i dati.");
         }
-        // crea salva passaggero
-        Passeggero psg = new Passeggero(nome, cognome, cf);
-        PasseggeroDAO passeggeroDao = new PasseggeroDAO(conn);
-        int passeggeroId = passeggeroDao.salvaPasseggero(psg);
-
-        if (passeggeroId == 0) {
-            JOptionPane.showMessageDialog(this, "errore salvataggio Passeggero");
-            return;
-        }
-
-        Random rand = new Random();
-        int num_biglietto = 1000 + rand.nextInt(999999);
-        int prenotazioneId = 1 + rand.nextInt(10000);
-        String documento = cf;
-        String stato = "Prenotazione confermata";
-
-        Prenotazione pr = new Prenotazione(prenotazioneId,num_biglietto, passeggeroId, documento, selezionato.getId(), stato);
-        PrenotazioneDAO prenotazioneDao = new PrenotazioneDAO(conn);
-        prenotazioneDao.salvaPrenotazione(pr);
-        JOptionPane.showMessageDialog(this, "Prenotazione confermata");
-
-        nomeField.setText("");
-        cognomeField.setText("");
-        codiceFiscale.setText("");
     }
 }

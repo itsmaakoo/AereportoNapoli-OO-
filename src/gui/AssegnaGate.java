@@ -2,18 +2,16 @@ package gui;
 
 import javax.swing.*;
 import java.awt.*;
-import dao.VoloDAO;
-import db.ConnessioneDB;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
-
 import model.Volo;
+import controller.AssegnaGateController;
 
 public class AssegnaGate extends JFrame {
-    private Connection conn;
+    private AssegnaGateController controller;
 
     public AssegnaGate() {
+        controller = new AssegnaGateController();
+
         setTitle("Assegna Gate");
         setSize(400, 200);
         setLocationRelativeTo(null);
@@ -24,16 +22,10 @@ public class AssegnaGate extends JFrame {
         c.insets = new Insets(2, 2, 2, 2);
         c.fill = GridBagConstraints.HORIZONTAL;
 
-
         JComboBox<Volo> voloJComboBox = new JComboBox<>();
-
-        conn = ConnessioneDB.getConnection();
-        if (conn != null) {
-            VoloDAO voloDAO = new VoloDAO(conn);
-            List<Volo> voli = voloDAO.getTuttiVoli();
-            for (Volo v : voli) {
-                voloJComboBox.addItem(v);
-            }
+        List<Volo> voli = controller.getTuttiVoli();
+        for (Volo v : voli) {
+            voloJComboBox.addItem(v);
         }
 
         JLabel voloLabel = new JLabel("Seleziona Volo");
@@ -69,18 +61,21 @@ public class AssegnaGate extends JFrame {
         confermaButton.addActionListener(e -> {
             Volo volo = (Volo) voloJComboBox.getSelectedItem();
             String gate = gateJTextField.getText().trim();
+
             if (volo != null && !gate.isEmpty()) {
-                volo.setGate(gate);
+                boolean success = controller.assegnaGate(volo.getId(), gate);
 
-                VoloDAO voloDAO = new VoloDAO(conn);
-                voloDAO.aggiornaGate(volo.getId(), gate);
-
-                JOptionPane.showMessageDialog(this, "Assegna gate: " + gate + "al Volo" + volo.getDestinazione());
-                dispose();
-            }else{
-                JOptionPane.showMessageDialog(this, "Seleziona un volo e inserisci un gate valido");
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "Assegna gate: " + gate + "al Volo" + volo.getDestinazione());
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Errore nell'assegnazione del gate.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Seleziona un volo e inserisci un gate valido.");
             }
         });
+
         add(panel);
         setVisible(true);
     }

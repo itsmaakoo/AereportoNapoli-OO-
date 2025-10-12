@@ -1,11 +1,8 @@
 package gui;
 
-import dao.PrenotazioneDAO;
-import dao.BagaglioDAO;
+import controller.AggiungiBagaglioController;
 import dao.VoloDAO;
 import db.ConnessioneDB;
-import model.Bagaglio;
-import model.Prenotazione;
 import model.Volo;
 import javax.swing.*;
 import java.awt.*;
@@ -17,6 +14,8 @@ public class AggiungiBagaglio extends JFrame {
     private JComboBox<Volo> voloJComboBox;
     private JTextField campoBagaglio;
     private JButton confermaButton;
+
+    private AggiungiBagaglioController controller;
 
     public AggiungiBagaglio() {
         setTitle("Aggiungi bagaglio");
@@ -76,41 +75,9 @@ public class AggiungiBagaglio extends JFrame {
 
         add(panel);
 
-        confermaButton.addActionListener(e -> {
-            Volo selezionato = (Volo) voloJComboBox.getSelectedItem();
-            String descrizione = campoBagaglio.getText().trim();
+        confermaButton.addActionListener(controller.getAggiungiBagaglioAction(voloJComboBox, campoBagaglio, this));
 
-            if (selezionato != null && !descrizione.isEmpty()) {
-                try {
-                    int codiceBagaglio = Integer.parseInt(descrizione);
-                    Connection connBagaglio = ConnessioneDB.getConnection();
-
-                    PrenotazioneDAO prenotazionidao = new PrenotazioneDAO(connBagaglio);
-                    List<Prenotazione> prenotazioni = prenotazionidao.trovaPrenotazioniPerVolo(selezionato.getId());
-
-                    if (!prenotazioni.isEmpty()) {
-                        Prenotazione primaprenotazione = prenotazioni.get(0); //usa la prima Prenotazione come default
-                        int Id = primaprenotazione.getId();
-                        Bagaglio nuovoBagaglio = new Bagaglio(Id, codiceBagaglio, "bagaglio aggiunto manualmente");
-                        BagaglioDAO bagagliodao = new BagaglioDAO(connBagaglio);
-                        bagagliodao.add(nuovoBagaglio, Id);
-                        JOptionPane.showMessageDialog(this, "Bagaglio aggiunto al Volo");
-                        campoBagaglio.setText("");
-
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Nessuna Prenotazione trovata per questo Volo");
-                    }
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Inserisci un numero valido per il codice del bagaglio.");
-
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Inserisci un numero valido per codice del bagaglio.");
-                    ex.printStackTrace();
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Seleziona un Volo e inserisci il codice del bagaglio.");
-            }
-        });
         setVisible(true);
+
     }
 }

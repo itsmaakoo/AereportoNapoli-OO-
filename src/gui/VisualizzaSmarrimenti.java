@@ -1,8 +1,7 @@
 package gui;
 
-import model.Bagaglio;
-import model.Volo;
-import model.StatoBagaglio;
+import controller.VisualizzaSmarrimentiController;
+
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -12,6 +11,7 @@ public class VisualizzaSmarrimenti extends JFrame {
 
     private JTable tabellaSmarrimenti;
     private DefaultTableModel tableModel;
+    private VisualizzaSmarrimentiController controller;
 
     public VisualizzaSmarrimenti(){
         setTitle("bagagli smarrito");
@@ -25,25 +25,10 @@ public class VisualizzaSmarrimenti extends JFrame {
         tabellaSmarrimenti = new JTable(tableModel);
         add(new JScrollPane(tabellaSmarrimenti), BorderLayout.CENTER);
 
-        caricaBagagliSmarriti();
+        controller = new VisualizzaSmarrimentiController(tableModel);
+        controller.caricaBagagliSmarriti();
 
         setVisible(true);
     }
-    private void caricaBagagliSmarriti(){
-        tableModel.setRowCount(0);
 
-        for(Volo v : Volo.archivio) {
-            for (Bagaglio b : v.getBagagli()) {
-                if (b.getStato() == StatoBagaglio.smarrito) {
-                    Object[] row = {
-                            v.toString(),
-                            b.getCodice(),
-                            b.getDescrizione(),
-                            b.getStato().toString()
-                    };
-                    tableModel.addRow(row);
-                }
-            }
-        }
-    }
 }

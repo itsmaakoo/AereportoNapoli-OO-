@@ -99,20 +99,7 @@ public class LoginFrame extends JFrame {
 
         add(backgroundPanel);
 
-        LButton.addActionListener(e -> {
-            String username = textField1.getText();
-            String password = String.valueOf(passwordField1.getPassword());
-
-            if (username.equals("admin") && password.equals("admin123")) {
-                new AmministratoreGUI();
-                dispose();
-            } else if (username.equals("Utente") && password.equals("utente123")) {
-                new UtenteGenericoPanel();
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(null, "Errore nella chiusura della password");
-            }
-        });
+        new controller.LoginFrameController(this);
 
         setSize(800, 500);
         setLocationRelativeTo(null);

@@ -38,8 +38,8 @@ public class PrenotazioneDAO {
                 Prenotazione p = new Prenotazione(
                         rs.getInt("id"),                      // id prenotazione
                         rs.getInt("num_biglietto"),           // numero biglietto
-                        rs.getInt("passeggero_id"),           // ID passeggero
-                        rs.getString("codicefiscale"),        // documento
+                        rs.getString("codicefiscale"),
+                        rs.getInt("passeggero_id"),           // ID passeggero// documento
                         rs.getInt("volo_id"),                 // ID volo
                         rs.getString("stato")                 // stato
                 );
@@ -64,8 +64,8 @@ public class PrenotazioneDAO {
                 Prenotazione p = new Prenotazione(
                         rs.getInt("id"),
                         rs.getInt("num_biglietto"),
-                        rs.getInt("passeggero_id"),
                         rs.getString("codicefiscale"),
+                        rs.getInt("passeggero_id"),
                         rs.getInt("volo_id"),
                         rs.getString("stato")
                 );

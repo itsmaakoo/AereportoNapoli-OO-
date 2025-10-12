@@ -1,12 +1,8 @@
 package gui;
 
-import dao.VoloDAO;
-import db.ConnessioneDB;
-import model.Volo;
-
+import controller.InserisciVoloController;
 import javax.swing.*;
 import java.awt.*;
-import java.sql.Connection;
 import java.util.Date;
 
 public class InserisciVolo extends JFrame {
@@ -15,12 +11,15 @@ public class InserisciVolo extends JFrame {
     private JSpinner dataPartenzaSpinner;
     private JSpinner dataArrivoSpinner;
     private JButton confermaButton;
+    private InserisciVoloController controller;
 
     public InserisciVolo() {
         setTitle("Inserisci Volo");
         setSize(400, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        controller = new InserisciVoloController();
 
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -61,47 +60,24 @@ public class InserisciVolo extends JFrame {
         c.anchor = GridBagConstraints.CENTER;
         panel.add(confermaButton, c);
 
-        confermaButton.addActionListener(e -> inserisciVolo());
+        confermaButton.addActionListener(e -> salvaVolo());
 
         add(panel);
         setVisible(true);
     }
 
-    private void inserisciVolo() {
+    private void salvaVolo() {
         String destinazione = destinazioneField.getText().trim();
         Date partenza = (Date) dataPartenzaSpinner.getValue();
         Date arrivo = (Date) dataArrivoSpinner.getValue();
 
-        if (!arrivo.after(partenza) && !arrivo.equals(partenza)) {
-            JOptionPane.showMessageDialog(this, "La data di arrivo deve essere uguale o successiva alla partenza.");
-            return;
-        }
+        boolean success = controller.salvaVolo(destinazione, partenza, arrivo);
 
-
-        if (destinazione.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Inserisci una destinazione.");
-            return;
-        }
-
-
-        // Crea il volo senza ID (verrà generato dal DB)
-        Volo nuovoVolo = new Volo (0, destinazione, partenza, arrivo, "programmato", "1"); // puoi cambiare gate e stato
-
-        try {
-            Connection conn = ConnessioneDB.getConnection();
-            VoloDAO voloDao = new VoloDAO(conn);
-            boolean successo = voloDao.salvaVolo(nuovoVolo);
-
-            if (successo) {
-                JOptionPane.showMessageDialog(this, "Volo inserito con ID: " + nuovoVolo.getId());
-                destinazioneField.setText("");
-                // resetta anche gli spinner se vuoi
-            } else {
-                JOptionPane.showMessageDialog(this, "Errore durante l'inserimento del volo.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Errore di connessione o salvataggio.");
+        if (success) {
+            JOptionPane.showMessageDialog(this, "Volo inserito correttamente.");
+            destinazioneField.setText("");
+        } else {
+            JOptionPane.showMessageDialog(this, "Errore verifica i dati o la connessione.");
         }
     }
 
